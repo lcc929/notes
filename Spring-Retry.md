@@ -1,10 +1,27 @@
-# Spring-Retry 重试框架
+# Spring-Retry 重试框架 
 
-基于异常实现的重试框架
+前言：该文档版本：spring-retry-1.2.4.RELEASE
 
-### 接口设计：
-1. `RetryOperations`：重试操作，定义了几种执行重试的方式
-2. `RetryCallback`：重试回调
+### 介绍
+
+**官方介绍：**  
+This project provides declarative retry support for Spring applications. It is used in Spring Batch, Spring Integration, Spring for Apache Hadoop (amongst others).
+
+**快速介绍：**  
+Spring Retry原来是Spring Batch的一个基于异常的重试功能，在Spring Batch 2.20后独立出来，成为Spring的一个子项目。Spring Retry的源码简单易读，有声明式和模板式两种方案提供给开发者在不同粒度下的选择，有多种重试策略，重试回退，有无状态重试等。使用注解方式开发简易快捷，可以减少大量重复代码，是大多数对粒度要求不是非常高的情况下的首选。
+
+因为Spring Retry底层是基于捕获异常来实现的，所以在重试代码中不能捕获异常。另外，框架不是万能的，结合实际业务场景使用是非常重要的一点，我们需要判断实际使用场景中重试带来的问题，判断是否能够进行重试等。
+
+Spring Retry的劣势主要在于它完全基于Java的异常来进行重试，try-catch会在一定程度上影响JVM对代码的优化，而且异常的创建会对当前栈进行快照，当异常业务频繁出现，这方面的开销也是不可忽略的。因此在系统对性能的敏感度非常高时，这些因素也是需要考虑的。同时，在实际开发过程中也很难避免与异常使用准则“不使用异常处理正常业务逻辑”相冲突。
+
+最后，因为本人无微服务项目方面的经验，因此本次分享不对Spring Retry在分布式的使用展开，但是使用理念也大致相同，据我所知在RPC调用中较为实用。
+
+
+
+
+### 主要接口：
+1. `RetryOperations`：重试操作类，定义了几种执行重试的方式
+2. `RetryCallback`：重试回调（执行被重试方法）
 3. `RetryContext`：重试上下文
 4. `RecoveryCallback`：回调恢复机制（重试达到上限时执行的回调，以保证业务恢复）
 5. `RetryState`：重试状态，分为有状态重试和无状态重试
@@ -17,8 +34,9 @@
 * `TimeoutRetryPolicy`：超时放弃策略
 * `ExceptionClassifierRetryPolicy`：根据异常类型自定义策略的策略
 
-
-
+### 执行流程
+- 入口:
+    RetryTemplate模板中定义了几项默认的策略（默认重试3次，不退让），
 
 
 ### 声明式重试
